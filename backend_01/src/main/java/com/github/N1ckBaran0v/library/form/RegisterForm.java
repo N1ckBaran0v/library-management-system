@@ -1,5 +1,6 @@
 package com.github.N1ckBaran0v.library.form;
 
+import com.github.N1ckBaran0v.library.data.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
@@ -10,7 +11,7 @@ public class RegisterForm implements Form {
     private String confirmPassword = "";
     private String name = "";
     private String phone = "";
-    private String role = "user";
+    private String role = User.USER_ROLE;
 
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]{6,16}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^8\\(9[0-9]{2}\\) [0-9]{3}-[0-9]{2}-[0-9]{2}$");

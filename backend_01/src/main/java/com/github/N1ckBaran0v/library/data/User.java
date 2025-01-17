@@ -11,6 +11,10 @@ public class User implements Serializable {
     private String phone;
     private String role;
 
+    public static final String USER_ROLE = "user";
+    public static final String WORKER_ROLE = "worker";
+    public static final String ADMIN_ROLE = "admin";
+
     public String getUsername() {
         return username;
     }
