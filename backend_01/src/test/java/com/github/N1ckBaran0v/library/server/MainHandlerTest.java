@@ -50,7 +50,7 @@ class MainHandlerTest {
         given(controllerManager.getController(RequestMethod.GET, "/test")).willReturn(miniController);
         mainHandler.handle(httpExchange);
         verify(httpExchange).setAttribute("content-type", "application/json");
-        verify(httpExchange).sendResponseHeaders(200, 7);
+        verify(httpExchange).sendResponseHeaders(HttpStatus.OK, 9);
     }
 
     @Test
@@ -66,7 +66,7 @@ class MainHandlerTest {
         willThrow(RuntimeException.class).given(miniController).handle(any());
         mainHandler.handle(httpExchange);
         verify(httpExchange).setAttribute("content-type", "application/json");
-        verify(httpExchange).sendResponseHeaders(500, 25);
+        verify(httpExchange).sendResponseHeaders(HttpStatus.INTERNAL_SERVER_ERROR, 25);
     }
 
     @Test
@@ -82,7 +82,7 @@ class MainHandlerTest {
         willThrow(ConvertationException.class).given(miniController).handle(any());
         mainHandler.handle(httpExchange);
         verify(httpExchange).setAttribute("content-type", "application/json");
-        verify(httpExchange).sendResponseHeaders(400, 15);
+        verify(httpExchange).sendResponseHeaders(HttpStatus.BAD_REQUEST, 15);
     }
 
     @Test
@@ -95,6 +95,6 @@ class MainHandlerTest {
         willThrow(ControllerNotFoundException.class).given(controllerManager).getController(RequestMethod.GET, "/test");
         mainHandler.handle(httpExchange);
         verify(httpExchange).setAttribute("content-type", "application/json");
-        verify(httpExchange).sendResponseHeaders(404, 13);
+        verify(httpExchange).sendResponseHeaders(HttpStatus.NOT_FOUND, 13);
     }
 }

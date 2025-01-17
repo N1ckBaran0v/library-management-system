@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class EndpointContext {
-    private static final String DEFAULT_MESSAGE = "Success";
+    private static final String DEFAULT_MESSAGE = "\"Success\"";
 
     private String responseBody = DEFAULT_MESSAGE;
     private int responseCode = HttpStatus.OK;

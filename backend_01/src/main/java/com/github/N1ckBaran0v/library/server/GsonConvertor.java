@@ -19,7 +19,11 @@ public class GsonConvertor implements JsonConvertor {
     @Override
     public <T> T fromJson(@NotNull InputStream input, @NotNull Class<T> clazz) throws IOException {
         try (var reader = new InputStreamReader(input)) {
-            return gson.fromJson(reader, clazz);
+            var result = gson.fromJson(reader, clazz);
+            if (result == null) {
+                throw new JsonSyntaxException("Could not parse json");
+            }
+            return result;
         } catch (JsonSyntaxException e) {
             throw new ConvertationException();
         }

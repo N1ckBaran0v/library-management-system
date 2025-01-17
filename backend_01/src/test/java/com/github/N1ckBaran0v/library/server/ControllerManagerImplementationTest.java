@@ -21,18 +21,18 @@ class ControllerManagerImplementationTest {
     }
 
     @Test
-    void addSuccess() {
+    void registerControllerSuccess() {
         manager.registerController(RequestMethod.GET, "/thread1", controller);
     }
 
     @Test
-    void getController() {
+    void getControllerSuccess() {
         var result = manager.getController(RequestMethod.GET, "/thread");
         assertEquals(controller, result);
     }
 
     @Test
-    void controllerConflictController() {
+    void controllerConflictException() {
         assertThrows(ControllersConflictException.class,
                 () -> manager.registerController(RequestMethod.GET, "/thread", controller));
     }
