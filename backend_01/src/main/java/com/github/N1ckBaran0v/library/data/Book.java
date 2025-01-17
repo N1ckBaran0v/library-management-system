@@ -1,12 +1,12 @@
 package com.github.N1ckBaran0v.library.data;
 
-import java.io.Serializable;
+import com.github.N1ckBaran0v.library.form.Checkable;
 
-public class Book implements Serializable {
+public class Book implements Checkable {
     private Long id;
-    private String title;
-    private String author;
-    private String genre;
+    private String title = "";
+    private String author = "";
+    private String genre = "";
     private int totalCount;
     private int availableCount;
 
@@ -56,5 +56,10 @@ public class Book implements Serializable {
 
     public void setAvailableCount(int availableCount) {
         this.availableCount = availableCount;
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return title.isBlank() || author.isBlank() || genre.isBlank() || availableCount <= 1 || totalCount != availableCount;
     }
 }

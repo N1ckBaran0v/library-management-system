@@ -14,4 +14,7 @@ public interface BookService {
     List<History> findUserHistory(@NotNull String username, @NotNull User user);
     void getBooks(@NotNull String username, @NotNull List<Long> books, @NotNull User user);
     void returnBooks(@NotNull String username, @NotNull List<Long> books, @NotNull User user);
+    void createBook(@NotNull Book book, @NotNull User user);
+    void updateBook(@NotNull Book book, @NotNull User user);
+    void deleteBook(@NotNull Long book, @NotNull User user);
 }

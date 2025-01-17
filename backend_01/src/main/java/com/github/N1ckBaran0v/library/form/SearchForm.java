@@ -1,6 +1,6 @@
 package com.github.N1ckBaran0v.library.form;
 
-public class SearchForm implements Form {
+public class SearchForm implements Checkable {
     private String title;
     private String author;
     private String genre;

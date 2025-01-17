@@ -2,7 +2,7 @@ package com.github.N1ckBaran0v.library.form;
 
 import org.jetbrains.annotations.NotNull;
 
-public class LoginForm implements Form {
+public class LoginForm implements Checkable {
     private String username = "";
     private String password = "";
 

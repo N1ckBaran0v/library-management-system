@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-public class RegisterForm implements Form {
+public class RegisterForm implements Checkable {
     private String username = "";
     private String password = "";
     private String confirmPassword = "";

@@ -18,7 +18,7 @@ public abstract class WorkerController extends AuthorizedController {
     }
 
     @Override
-    protected void _handle(@NotNull EndpointContext ctx, @NotNull String username) {
+    protected final void _handle(@NotNull EndpointContext ctx, @NotNull String username) {
         try {
             var target = ctx.getRequestParams().getOrDefault("username", null);
             if (target == null) {
