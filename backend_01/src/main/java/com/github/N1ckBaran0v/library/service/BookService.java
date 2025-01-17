@@ -12,4 +12,6 @@ public interface BookService {
     List<Book> findBooks(@NotNull SearchForm searchForm, @NotNull User user);
     List<Book> findUserBooks(@NotNull String username, @NotNull User user);
     List<History> findUserHistory(@NotNull String username, @NotNull User user);
+    void getBooks(@NotNull String username, @NotNull List<Long> books, @NotNull User user);
+    void returnBooks(@NotNull String username, @NotNull List<Long> books, @NotNull User user);
 }

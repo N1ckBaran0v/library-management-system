@@ -2,7 +2,6 @@ package com.github.N1ckBaran0v.library.controller;
 
 import com.github.N1ckBaran0v.library.server.EndpointContext;
 import com.github.N1ckBaran0v.library.server.HttpStatus;
-import com.github.N1ckBaran0v.library.service.BookService;
 import com.github.N1ckBaran0v.library.service.ForbiddenException;
 import com.github.N1ckBaran0v.library.service.UserService;
 import org.jetbrains.annotations.NotNull;

@@ -3,6 +3,7 @@ package com.github.N1ckBaran0v.library.controller;
 import com.github.N1ckBaran0v.library.data.User;
 import com.github.N1ckBaran0v.library.server.EndpointContext;
 import com.github.N1ckBaran0v.library.server.HttpStatus;
+import com.github.N1ckBaran0v.library.service.BookService;
 import com.github.N1ckBaran0v.library.service.ForbiddenException;
 import com.github.N1ckBaran0v.library.service.UnauthorizedException;
 import com.github.N1ckBaran0v.library.service.UserService;
@@ -22,12 +23,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class GetUserInfoControllerTest {
+public class PostBooksReturnControllerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private BookService bookService;
+
     @InjectMocks
-    private GetUserInfoController controller;
+    private PostBooksReturnController controller;
 
     @Mock
     private EndpointContext ctx;
@@ -38,43 +42,62 @@ class GetUserInfoControllerTest {
     }
 
     @Test
-    void searchSelfSuccess() {
-        var user = new User();
-        given(ctx.getRequestParams()).willReturn(new HashMap<>());
-        given(userService.getUsername("sessionId")).willReturn("username");
-        given(userService.getUser("sessionId", "username")).willReturn(user);
-        controller.handle(ctx);
-        verify(ctx).setResponseBody(user);
-    }
-
-    @Test
-    void searchAnotherSuccess() {
+    void returnBooksSuccess() {
+        var arr = new Long[]{1L, 2L, 3L};
         var map = new HashMap<String, String>();
         map.put("username", "anotherUsername");
-        var user = new User();
+        given(ctx.getRequestBody(Long[].class)).willReturn(arr);
         given(ctx.getRequestParams()).willReturn(map);
         given(userService.getUsername("sessionId")).willReturn("username");
-        given(userService.getUser("sessionId", "anotherUsername")).willReturn(user);
+        given(userService.getUser("sessionId")).willReturn(new User());
         controller.handle(ctx);
-        verify(ctx).setResponseBody(user);
+        verify(bookService).returnBooks(any(), any(), any());
     }
 
     @Test
     void authFailure() {
         willThrow(UnauthorizedException.class).given(userService).getUsername(any());
         controller.handle(ctx);
-        verify(userService, never()).getUser(any(), any());
+        verify(bookService, never()).getBooks(any(), any(), any());
         verify(ctx).setResponseCode(HttpStatus.UNAUTHORIZED);
         verify(ctx).setResponseBody("401 Unauthorized");
     }
 
     @Test
     void forbiddenFailure() {
-        given(ctx.getRequestParams()).willReturn(new HashMap<>());
+        var arr = new Long[]{1L, 2L, 3L};
+        var map = new HashMap<String, String>();
+        map.put("username", "anotherUsername");
+        given(ctx.getRequestBody(Long[].class)).willReturn(arr);
+        given(ctx.getRequestParams()).willReturn(map);
         given(userService.getUsername("sessionId")).willReturn("username");
-        willThrow(ForbiddenException.class).given(userService).getUser(any(), any());
+        given(userService.getUser("sessionId")).willReturn(new User());
+        willThrow(ForbiddenException.class).given(bookService).returnBooks(any(), any(), any());
         controller.handle(ctx);
         verify(ctx).setResponseCode(HttpStatus.FORBIDDEN);
         verify(ctx).setResponseBody("403 Forbidden");
+    }
+
+    @Test
+    void noUserFailure() {
+        var map = new HashMap<String, String>();
+        given(ctx.getRequestParams()).willReturn(map);
+        controller.handle(ctx);
+        verify(bookService, never()).returnBooks(any(), any(), any());
+        verify(ctx).setResponseCode(HttpStatus.BAD_REQUEST);
+        verify(ctx).setResponseBody("400 Bad Request");
+    }
+
+    @Test
+    void noBookFailure() {
+        var arr = new Long[]{};
+        var map = new HashMap<String, String>();
+        map.put("username", "anotherUsername");
+        given(ctx.getRequestBody(Long[].class)).willReturn(arr);
+        given(ctx.getRequestParams()).willReturn(map);
+        controller.handle(ctx);
+        verify(bookService, never()).returnBooks(any(), any(), any());
+        verify(ctx).setResponseCode(HttpStatus.BAD_REQUEST);
+        verify(ctx).setResponseBody("400 Bad Request");
     }
 }
