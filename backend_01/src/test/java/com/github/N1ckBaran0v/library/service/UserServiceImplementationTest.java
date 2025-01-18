@@ -196,9 +196,15 @@ class UserServiceImplementationTest {
     }
 
     @Test
-    void successfulGetAnotherUser() {
+    void successfulGetAnotherUser1() {
         given(databaseService.findUserByUsername(worker.getUsername())).willReturn(worker);
         assertEquals(worker, userService.getUser("sessionAdmin", worker.getUsername()));
+    }
+
+    @Test
+    void successfulGetAnotherUser2() {
+        given(databaseService.findUserByUsername(worker.getUsername())).willReturn(worker);
+        assertEquals(worker, userService.getUser("sessionWorker", worker.getUsername()));
     }
 
     @Test

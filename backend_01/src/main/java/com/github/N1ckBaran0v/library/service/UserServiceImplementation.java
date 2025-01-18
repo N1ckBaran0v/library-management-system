@@ -118,7 +118,7 @@ public class UserServiceImplementation implements UserService {
     public User getUser(@NotNull String sessionId, @NotNull String username) {
         try {
             var current = getUser(sessionId);
-            if (!User.ADMIN_ROLE.equals(current.getRole())) {
+            if (!(User.ADMIN_ROLE.equals(current.getRole()) || username.equals(current.getUsername()))) {
                 throw new ForbiddenException();
             }
             return databaseService.findUserByUsername(username);
