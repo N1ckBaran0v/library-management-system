@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String username;
-    private String password;
-    private String name;
-    private String phone;
-    private String role;
+    private String username = "";
+    private String password = "";
+    private String name = "";
+    private String phone = "";
+    private String role = "";
 
     public static final String USER_ROLE = "user";
     public static final String WORKER_ROLE = "worker";

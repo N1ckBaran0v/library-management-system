@@ -28,10 +28,10 @@ public class PostRegisterController implements MiniController {
                 userService.register(form, ctx.getSessionId());
                 ctx.setResponseCode(HttpStatus.CREATED);
             }
-        } catch (UserAlreadyExistsException | SessionNotEndedException exception) {
+        } catch (UserAlreadyExistsException | SessionNotEndedException e) {
             ctx.setResponseCode(HttpStatus.CONFLICT);
             ctx.setResponseBody("409 Conflict");
-        } catch (ForbiddenException exception) {
+        } catch (ForbiddenException e) {
             ctx.setResponseCode(HttpStatus.FORBIDDEN);
             ctx.setResponseBody("403 Forbidden");
         }
