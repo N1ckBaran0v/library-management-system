@@ -32,7 +32,7 @@ public class SQLiteUsersRepository implements UsersRepository {
     public void deleteByUsername(@NotNull Connection connection, @NotNull String username) throws SQLException {
         try (var statement = connection.prepareStatement("DELETE FROM users WHERE username = (?);")) {
             statement.setString(1, username);
-            statement.executeQuery();
+            statement.execute();
         }
     }
 

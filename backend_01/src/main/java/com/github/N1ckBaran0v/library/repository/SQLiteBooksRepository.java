@@ -86,7 +86,7 @@ public class SQLiteBooksRepository implements BooksRepository {
     public void deleteBook(@NotNull Connection connection, @NotNull Long id) throws SQLException {
         try (var statement = connection.prepareStatement("DELETE FROM books WHERE book_id = (?);")) {
             statement.setLong(1, id);
-            statement.executeUpdate();
+            statement.execute();
         }
     }
 }

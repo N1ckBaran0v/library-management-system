@@ -103,7 +103,11 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public String getUsername(@NotNull String sessionId) {
-        return getUser(sessionId).getUsername();
+        try {
+            return getUser(sessionId).getUsername();
+        } catch (UserNotFoundException e) {
+            throw new UnauthorizedException();
+        }
     }
 
     @Override
