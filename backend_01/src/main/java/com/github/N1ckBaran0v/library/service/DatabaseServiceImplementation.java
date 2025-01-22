@@ -146,7 +146,8 @@ public class DatabaseServiceImplementation implements DatabaseService {
     }
 
     private <T> T transactionalOperation(@NotNull DatabaseFunction<T> operation) {
-        try (var connection = databaseManager.getConnection()) {
+        try {
+            var connection = databaseManager.getConnection();
             try {
                 var result = operation.apply(connection);
                 connection.commit();
@@ -163,7 +164,8 @@ public class DatabaseServiceImplementation implements DatabaseService {
     }
 
     private void transactionalOperation(@NotNull DatabaseConsumer operation) {
-        try (var connection = databaseManager.getConnection()) {
+        try {
+            var connection = databaseManager.getConnection();
             try {
                 operation.accept(connection);
                 connection.commit();

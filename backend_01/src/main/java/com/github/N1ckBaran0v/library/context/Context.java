@@ -8,7 +8,9 @@ public class Context {
     public Context(int port) {
         var serverContext = new ServerContext(port);
         server = serverContext.getServer();
-        var controllerContext = new ControllerContext();
+        var databaseContext = new DatabaseContext();
+        var serviceContext = new ServiceContext(databaseContext);
+        var controllerContext = new ControllerContext(serviceContext);
         controllerContext.setEndpoints(server);
     }
 
