@@ -28,9 +28,10 @@ public class Main {
         connector.setHost("127.0.0.1");
         server.addConnector(connector);
         var contextHandler = new ServletContextHandler();
+        var servlet = new DispatcherServlet(ctx);
         contextHandler.setErrorHandler(null);
         contextHandler.setContextPath(CONTEXT_PATH);
-        contextHandler.addServlet(new ServletHolder(new DispatcherServlet(ctx)), DISPATCHER_PATH);
+        contextHandler.addServlet(new ServletHolder(servlet), DISPATCHER_PATH);
         contextHandler.addEventListener(new ContextLoaderListener(ctx));
         server.setHandler(contextHandler);
         server.start();
