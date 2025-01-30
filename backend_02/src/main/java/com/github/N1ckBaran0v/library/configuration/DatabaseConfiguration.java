@@ -2,12 +2,10 @@ package com.github.N1ckBaran0v.library.configuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertyResolver;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -26,12 +24,10 @@ import java.util.Properties;
 @PropertySource({"classpath:database.properties", "classpath:hibernate.properties"})
 public class DatabaseConfiguration {
     private final Environment env;
-    private final PropertyResolver propertyResolver;
 
     @Autowired
-    public DatabaseConfiguration(@NotNull Environment env, @Qualifier("propertyResolver") PropertyResolver propertyResolver) {
+    public DatabaseConfiguration(@NotNull Environment env) {
         this.env = env;
-        this.propertyResolver = propertyResolver;
     }
 
     @Bean
@@ -61,7 +57,7 @@ public class DatabaseConfiguration {
         properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
         properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-        properties.put("hibernate.isolation", env.getProperty("hibernate.isolation"));
+        properties.put("hibernate.connection.isolation", env.getProperty("hibernate.connection.isolation"));
         return properties;
     }
 

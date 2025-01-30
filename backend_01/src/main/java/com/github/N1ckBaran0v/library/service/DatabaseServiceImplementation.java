@@ -8,8 +8,10 @@ import com.github.N1ckBaran0v.library.form.SearchForm;
 import com.github.N1ckBaran0v.library.repository.BooksRepository;
 import com.github.N1ckBaran0v.library.repository.HistoryRepository;
 import com.github.N1ckBaran0v.library.repository.UsersRepository;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeMap;
@@ -32,14 +34,14 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public User findUserByUsername(@NotNull String username) {
-        return transactionalOperation(conn -> {
+        return transactionalOperation(Connection.TRANSACTION_READ_COMMITTED, conn -> {
             return usersRepository.findByUsername(conn, username).orElseThrow(UserNotFoundException::new);
         });
     }
 
     @Override
     public void deleteUserByUsername(@NotNull String username) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_REPEATABLE_READ, conn -> {
             usersRepository.findByUsername(conn, username).orElseThrow(UserNotFoundException::new);
             usersRepository.deleteByUsername(conn, username);
         });
@@ -47,7 +49,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public void createUser(@NotNull User user) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_SERIALIZABLE, conn -> {
             usersRepository.findByUsername(conn, user.getUsername()).ifPresent(u -> {
                 throw new UserAlreadyExistsException();
             });
@@ -57,7 +59,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public List<Book> findBooksByParams(@NotNull SearchForm searchForm) {
-        return transactionalOperation(conn -> {
+        return transactionalOperation(Connection.TRANSACTION_READ_COMMITTED, conn -> {
             return booksRepository.findAllBooks(conn).stream().filter(book -> {
                 var result = true;
                 if (searchForm.getAuthor() != null && !book.getAuthor().equals(searchForm.getAuthor())) {
@@ -76,7 +78,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public List<Book> findBooksByUsername(@NotNull String username) {
-        return transactionalOperation(conn -> {
+        return transactionalOperation(Connection.TRANSACTION_READ_COMMITTED, conn -> {
             var books = new TreeMap<Long, Integer>();
             historyRepository.getUserHistory(conn, username).forEach(history -> {
                 if (history.getOperationType().equals("get")) {
@@ -91,14 +93,14 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public List<History> findHistoryByUsername(@NotNull String username) {
-        return transactionalOperation(conn -> {
+        return transactionalOperation(Connection.TRANSACTION_READ_COMMITTED, conn -> {
             return historyRepository.getUserHistory(conn, username);
         });
     }
 
     @Override
     public void getBooks(@NotNull String username, @NotNull List<Long> books) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_REPEATABLE_READ, conn -> {
             historyRepository.getBooks(conn, books.stream().map(bookId -> {
                 var history = new History();
                 history.setBookId(bookId);
@@ -111,7 +113,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public void returnBooks(@NotNull String username, @NotNull List<Long> books) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_REPEATABLE_READ, conn -> {
             historyRepository.returnBooks(conn, books.stream().map(bookId -> {
                 var history = new History();
                 history.setBookId(bookId);
@@ -124,14 +126,14 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public void createBook(@NotNull Book book) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_SERIALIZABLE, conn -> {
             booksRepository.createBook(conn, book);
         });
     }
 
     @Override
     public void updateBook(@NotNull Book book) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_REPEATABLE_READ, conn -> {
             booksRepository.findBookById(conn, book.getId()).orElseThrow(BookNotFoundException::new);
             booksRepository.updateBook(conn, book);
         });
@@ -139,16 +141,17 @@ public class DatabaseServiceImplementation implements DatabaseService {
 
     @Override
     public void deleteBook(@NotNull Long book) {
-        transactionalOperation(conn -> {
+        transactionalOperation(Connection.TRANSACTION_REPEATABLE_READ, conn -> {
             booksRepository.findBookById(conn, book).orElseThrow(BookNotFoundException::new);
             booksRepository.deleteBook(conn, book);
         });
     }
 
-    private <T> T transactionalOperation(@NotNull DatabaseFunction<T> operation) {
+    private <T> T transactionalOperation(@MagicConstant int isolation, @NotNull DatabaseFunction<T> operation) {
         try {
             var connection = databaseManager.getConnection();
             try {
+                connection.setTransactionIsolation(isolation);
                 var result = operation.apply(connection);
                 connection.commit();
                 return result;
@@ -163,10 +166,11 @@ public class DatabaseServiceImplementation implements DatabaseService {
         }
     }
 
-    private void transactionalOperation(@NotNull DatabaseConsumer operation) {
+    private void transactionalOperation(@MagicConstant int isolation, @NotNull DatabaseConsumer operation) {
         try {
             var connection = databaseManager.getConnection();
             try {
+                connection.setTransactionIsolation(isolation);
                 operation.accept(connection);
                 connection.commit();
             } catch (Error | Exception e) {
