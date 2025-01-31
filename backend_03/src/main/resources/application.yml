@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: library-management-system
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:database.sqlite
+    hikari:
+      auto-commit: false
+      transaction-isolation: TRANSACTION_READ_COMMITTED
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
