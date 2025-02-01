@@ -31,12 +31,6 @@ public class RegisterForm {
     @NotBlank
     private String role = User.USER_ROLE;
 
-    public RegisterForm() {
-    }
-
-    public RegisterForm(String username, String password, String confirmPassword, String name, String phone) {
-    }
-
     public String getUsername() {
         return username;
     }

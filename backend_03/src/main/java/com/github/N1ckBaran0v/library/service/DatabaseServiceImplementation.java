@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -75,6 +75,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
     @Override
     @Transactional
     public List<Book> findBooksByUsername(@NotNull String username) {
+        userRepository.findById(username).orElseThrow(UserNotFoundException::new);
         var books = new TreeMap<Long, Integer>();
         historyRepository.findAllByUsername(username).forEach(history -> {
             if (history.getOperationType().equals("get")) {
@@ -89,12 +90,23 @@ public class DatabaseServiceImplementation implements DatabaseService {
     @Override
     @Transactional
     public List<History> findHistoryByUsername(@NotNull String username) {
+        userRepository.findById(username).orElseThrow(UserNotFoundException::new);
         return historyRepository.findAllByUsername(username);
     }
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void getBooks(@NotNull String username, @NotNull List<Long> books) {
+        var map = new HashMap<Long, Book>();
+        StreamSupport.stream(bookRepository.findAllById(books).spliterator(), false).forEach(book -> map.put(book.getId(), book));
+        for (var id : books) {
+            var book = map.get(id);
+            book.setAvailableCount(book.getAvailableCount() - 1);
+            if (book.getAvailableCount() < 0) {
+                throw new BookNotFoundException();
+            }
+        }
+        bookRepository.saveAll(map.values());
         historyRepository.saveAll(books.stream().map(bookId -> {
             var history = new History();
             history.setBookId(bookId);
@@ -107,6 +119,16 @@ public class DatabaseServiceImplementation implements DatabaseService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void returnBooks(@NotNull String username, @NotNull List<Long> books) {
+        var map = new HashMap<Long, Book>();
+        StreamSupport.stream(bookRepository.findAllById(books).spliterator(), false).forEach(book -> map.put(book.getId(), book));
+        for (var id : books) {
+            var book = map.get(id);
+            book.setAvailableCount(book.getAvailableCount() + 1);
+            if (book.getAvailableCount() > book.getTotalCount()) {
+                throw new BookNotFoundException();
+            }
+        }
+        bookRepository.saveAll(map.values());
         historyRepository.saveAll(books.stream().map(bookId -> {
             var history = new History();
             history.setBookId(bookId);
