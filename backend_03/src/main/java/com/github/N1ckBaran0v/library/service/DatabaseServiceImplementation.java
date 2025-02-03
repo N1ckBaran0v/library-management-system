@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -97,6 +96,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void getBooks(@NotNull String username, @NotNull List<Long> books) {
+        userRepository.findById(username).orElseThrow(UserNotFoundException::new);
         var map = new HashMap<Long, Book>();
         StreamSupport.stream(bookRepository.findAllById(books).spliterator(), false).forEach(book -> map.put(book.getId(), book));
         for (var id : books) {
@@ -119,6 +119,7 @@ public class DatabaseServiceImplementation implements DatabaseService {
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void returnBooks(@NotNull String username, @NotNull List<Long> books) {
+        userRepository.findById(username).orElseThrow(UserNotFoundException::new);
         var map = new HashMap<Long, Book>();
         StreamSupport.stream(bookRepository.findAllById(books).spliterator(), false).forEach(book -> map.put(book.getId(), book));
         for (var id : books) {

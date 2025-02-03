@@ -20,10 +20,13 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-web") {
-		exclude("org.springframework.boot:spring-boot-starter-tomcat")
-	}
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-jetty")
+	modules {
+		module("org.springframework.boot:spring-boot-starter-tomcat") {
+			replacedBy("org.springframework.boot:spring-boot-starter-jetty", "Use Jetty instead of Tomcat")
+		}
+	}
 	implementation("org.hibernate.orm:hibernate-community-dialects")
 	implementation("org.xerial:sqlite-jdbc:3.48.0.0")
 	implementation("org.jetbrains:annotations:26.0.1")

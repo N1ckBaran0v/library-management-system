@@ -20,6 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -226,22 +227,37 @@ class DatabaseServiceImplementationTest {
     @Test
     void getBooksSuccess() {
         var list = List.of(1L, 2L);
+        given(userRepository.findById("username")).willReturn(Optional.of(new User()));
         given(bookRepository.findAllById(list)).willReturn(List.of(books.get(0), books.get(1)));
         databaseService.getBooks("username", list);
+        verify(bookRepository).saveAll(any());
         verify(historyRepository).saveAll(any());
     }
 
     @Test
-    void getBooksNotFound() {
+    void getBooksNotFound1() {
         var list = List.of(1L, 1L);
+        given(userRepository.findById("username")).willReturn(Optional.of(new User()));
         given(bookRepository.findAllById(list)).willReturn(List.of(books.getFirst()));
         assertThrows(BookNotFoundException.class, () -> databaseService.getBooks("username", list));
+        verify(bookRepository, never()).saveAll(any());
+        verify(historyRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void getBooksNotFound2() {
+        var list = List.of(1L, 2L);
+        given(userRepository.findById(any())).willReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> databaseService.getBooks("username", list));
+        verify(bookRepository, never()).findAllById(any());
+        verify(bookRepository, never()).saveAll(any());
         verify(historyRepository, never()).saveAll(any());
     }
 
     @Test
     void returnBooksSuccess() {
         var list = List.of(5L);
+        given(userRepository.findById("username")).willReturn(Optional.of(new User()));
         given(bookRepository.findAllById(list)).willReturn(List.of(books.getLast()));
         databaseService.returnBooks("username", list);
         verify(bookRepository).saveAll(any());
@@ -249,10 +265,21 @@ class DatabaseServiceImplementationTest {
     }
 
     @Test
-    void returnBooksNotFound() {
+    void returnBooksNotFound1() {
         var list = List.of(5L, 5L);
+        given(userRepository.findById("username")).willReturn(Optional.of(new User()));
         given(bookRepository.findAllById(list)).willReturn(List.of(books.getLast()));
         assertThrows(BookNotFoundException.class, () -> databaseService.returnBooks("username", list));
+        verify(bookRepository, never()).saveAll(any());
+        verify(historyRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void returnBooksNotFound2() {
+        var list = List.of(5L);
+        given(userRepository.findById(any())).willReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> databaseService.returnBooks("username", list));
+        verify(bookRepository, never()).findAllById(any());
         verify(bookRepository, never()).saveAll(any());
         verify(historyRepository, never()).saveAll(any());
     }
