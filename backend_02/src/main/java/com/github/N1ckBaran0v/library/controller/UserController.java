@@ -2,10 +2,7 @@ package com.github.N1ckBaran0v.library.controller;
 
 import com.github.N1ckBaran0v.library.component.SessionInfo;
 import com.github.N1ckBaran0v.library.data.User;
-import com.github.N1ckBaran0v.library.service.BookService;
-import com.github.N1ckBaran0v.library.service.ForbiddenException;
-import com.github.N1ckBaran0v.library.service.UserNotFoundException;
-import com.github.N1ckBaran0v.library.service.UserService;
+import com.github.N1ckBaran0v.library.service.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,12 +27,15 @@ public class UserController {
         try {
             if (username == null) {
                 username = sessionInfo.getUsername();
+                if (username == null) {
+                    throw new UnauthorizedException();
+                }
             } else {
                 userService.getUser(sessionInfo, username);
             }
             response = ResponseEntity.ok(bookService.findUserHistory(sessionInfo, username));
         } catch (UserNotFoundException e) {
-            response = ResponseEntity.badRequest().body("400 Bad Request");
+            response = ResponseEntity.badRequest().body("User not found");
         }
         return response;
     }
@@ -46,12 +46,15 @@ public class UserController {
         try {
             if (username == null) {
                 username = sessionInfo.getUsername();
+                if (username == null) {
+                    throw new UnauthorizedException();
+                }
             } else {
                 userService.getUser(sessionInfo, username);
             }
             response = ResponseEntity.ok(bookService.findUserBooks(sessionInfo, username));
         } catch (UserNotFoundException e) {
-            response = ResponseEntity.badRequest().body("400 Bad Request");
+            response = ResponseEntity.badRequest().body("User not found");
         }
         return response;
     }
@@ -62,29 +65,30 @@ public class UserController {
         try {
             if (username == null) {
                 username = sessionInfo.getUsername();
+                if (username == null) {
+                    throw new UnauthorizedException();
+                }
             } else {
                 userService.getUser(sessionInfo, username);
             }
             response = ResponseEntity.ok(userService.getUser(sessionInfo, username));
         } catch (UserNotFoundException e) {
-            response = ResponseEntity.badRequest().body("400 Bad Request");
+            response = ResponseEntity.badRequest().body("User not found");
         }
         return response;
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> delete(@RequestParam(required = false) String username, @NotNull SessionInfo sessionInfo) {
+    public ResponseEntity<?> delete(@RequestParam String username, @NotNull SessionInfo sessionInfo) {
         ResponseEntity<?> response;
         try {
             if (username == null) {
-                username = sessionInfo.getUsername();
-            } else {
-                userService.getUser(sessionInfo, username);
+                throw new UnauthorizedException();
             }
             userService.deleteUser(sessionInfo, username);
             response = ResponseEntity.noContent().build();
         } catch (UserNotFoundException e) {
-            response = ResponseEntity.badRequest().body("400 Bad Request");
+            response = ResponseEntity.badRequest().body("User not found");
         }
         return response;
     }

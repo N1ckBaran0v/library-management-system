@@ -27,15 +27,17 @@ public class RegisterController {
     }
 
     @PostMapping
-    public ResponseEntity<String> register(@RequestBody RegisterForm form, @NotNull SessionInfo sessionInfo) {
-        var response = ResponseEntity.ok("Success");
+    public ResponseEntity<?> register(@RequestBody RegisterForm form, @NotNull SessionInfo sessionInfo) {
+        var response = ResponseEntity.ok().build();
         if (form.hasErrors()) {
-            response = ResponseEntity.badRequest().body("400 Bad Request");
+            response = ResponseEntity.badRequest().body("Invalid register data");
         } else {
             try {
-                userService.register(form, sessionInfo);
-            } catch (UserAlreadyExistsException | SessionNotEndedException e) {
-                response = new ResponseEntity<>("409 Conflict", HttpStatus.CONFLICT);
+                userService.register(sessionInfo, form);
+            } catch (UserAlreadyExistsException e) {
+                response = new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
+            } catch (SessionNotEndedException e) {
+                response = new ResponseEntity<>("Session not ended", HttpStatus.CONFLICT);
             }
         }
         return response;

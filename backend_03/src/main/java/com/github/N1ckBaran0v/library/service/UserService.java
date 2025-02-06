@@ -11,6 +11,5 @@ public interface UserService {
     void login(@NotNull SessionInfo sessionInfo, @NotNull LoginForm form);
     void logout(@NotNull SessionInfo sessionInfo);
     void deleteUser(@NotNull SessionInfo sessionInfo, @NotNull String username);
-    User getUser(@NotNull SessionInfo sessionInfo);
     User getUser(@NotNull SessionInfo sessionInfo, @NotNull String username);
 }

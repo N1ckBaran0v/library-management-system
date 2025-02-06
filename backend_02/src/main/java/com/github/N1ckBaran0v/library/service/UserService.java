@@ -7,10 +7,9 @@ import com.github.N1ckBaran0v.library.form.RegisterForm;
 import org.jetbrains.annotations.NotNull;
 
 public interface UserService {
-    void register(@NotNull RegisterForm form, @NotNull SessionInfo sessionInfo);
-    void login(@NotNull LoginForm form, @NotNull SessionInfo sessionInfo);
+    void register(@NotNull SessionInfo sessionInfo, @NotNull RegisterForm form);
+    void login(@NotNull SessionInfo sessionInfo, @NotNull LoginForm form);
     void logout(@NotNull SessionInfo sessionInfo);
     void deleteUser(@NotNull SessionInfo sessionInfo, @NotNull String username);
-    User getUser(@NotNull SessionInfo sessionInfo);
     User getUser(@NotNull SessionInfo sessionInfo, @NotNull String username);
 }

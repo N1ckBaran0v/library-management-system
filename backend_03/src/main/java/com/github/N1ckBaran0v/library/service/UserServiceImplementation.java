@@ -81,14 +81,6 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User getUser(@NotNull SessionInfo sessionInfo) {
-        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
-            throw new UnauthorizedException();
-        }
-        return databaseService.findUserByUsername(sessionInfo.getUsername());
-    }
-
-    @Override
     public User getUser(@NotNull SessionInfo sessionInfo, @NotNull String username) {
         if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
             throw new UnauthorizedException();

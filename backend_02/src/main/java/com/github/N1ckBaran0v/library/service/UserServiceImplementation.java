@@ -18,7 +18,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void register(@NotNull RegisterForm form, @NotNull SessionInfo sessionInfo) {
+    public void register(@NotNull SessionInfo sessionInfo, @NotNull RegisterForm form) {
         if (!User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
             if (!User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
                 throw new SessionNotEndedException();
@@ -33,16 +33,13 @@ public class UserServiceImplementation implements UserService {
         user.setPhone(form.getPhone());
         user.setRole(form.getRole());
         databaseService.createUser(user);
-        startSession(sessionInfo, user);
-    }
-
-    private void startSession(@NotNull SessionInfo sessionInfo, @NotNull User user) {
-        sessionInfo.setRole(user.getRole());
-        sessionInfo.setUsername(user.getUsername());
+        if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()))) {
+            startSession(sessionInfo, user);
+        }
     }
 
     @Override
-    public void login(@NotNull LoginForm form, @NotNull SessionInfo sessionInfo) {
+    public void login(@NotNull SessionInfo sessionInfo, @NotNull LoginForm form) {
         if (!User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
             throw new SessionNotEndedException();
         }
@@ -57,6 +54,11 @@ public class UserServiceImplementation implements UserService {
         }
     }
 
+    private void startSession(@NotNull SessionInfo sessionInfo, @NotNull User user) {
+        sessionInfo.setRole(user.getRole());
+        sessionInfo.setUsername(user.getUsername());
+    }
+
     @Override
     public void logout(@NotNull SessionInfo sessionInfo) {
         if (sessionInfo.getUsername() != null) {
@@ -69,6 +71,9 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void deleteUser(@NotNull SessionInfo sessionInfo, @NotNull String username) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (!User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
             throw new ForbiddenException();
         }
@@ -76,19 +81,13 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User getUser(@NotNull SessionInfo sessionInfo) {
-        return databaseService.findUserByUsername(sessionInfo.getUsername());
-    }
-
-    @Override
     public User getUser(@NotNull SessionInfo sessionInfo, @NotNull String username) {
-        try {
-            if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || username.equals(sessionInfo.getUsername()))) {
-                throw new ForbiddenException();
-            }
-            return databaseService.findUserByUsername(username);
-        } catch (UserNotFoundException e) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
+        if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || username.equals(sessionInfo.getUsername()))) {
             throw new ForbiddenException();
         }
+        return databaseService.findUserByUsername(username);
     }
 }

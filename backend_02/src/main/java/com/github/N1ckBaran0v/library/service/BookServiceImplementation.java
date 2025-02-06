@@ -22,6 +22,9 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public List<Book> findBooks(@NotNull SessionInfo sessionInfo, @NotNull SearchForm searchForm) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (searchForm.isShowUnavailable() && !User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
             throw new ForbiddenException();
         }
@@ -30,6 +33,9 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public List<Book> findUserBooks(@NotNull SessionInfo sessionInfo, @NotNull String username) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || username.equals(sessionInfo.getUsername()))) {
             throw new ForbiddenException();
         }
@@ -38,6 +44,9 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public List<History> findUserHistory(@NotNull SessionInfo sessionInfo, @NotNull String username) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || username.equals(sessionInfo.getUsername()))) {
             throw new ForbiddenException();
         }
@@ -46,6 +55,9 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public void getBooks(@NotNull SessionInfo sessionInfo, @NotNull String username, @NotNull List<Long> books) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || User.WORKER_ROLE.equals(sessionInfo.getRole()))) {
             throw new ForbiddenException();
         }
@@ -54,6 +66,9 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public void returnBooks(@NotNull SessionInfo sessionInfo, @NotNull String username, @NotNull List<Long> books) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
         if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || User.WORKER_ROLE.equals(sessionInfo.getRole()))) {
             throw new ForbiddenException();
         }
@@ -62,7 +77,10 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public void createBook(@NotNull SessionInfo sessionInfo, @NotNull Book book) {
-        if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || User.WORKER_ROLE.equals(sessionInfo.getRole()))) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
+        if (!User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
             throw new ForbiddenException();
         }
         databaseService.createBook(book);
@@ -70,7 +88,10 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public void updateBook(@NotNull SessionInfo sessionInfo, @NotNull Book book) {
-        if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || User.WORKER_ROLE.equals(sessionInfo.getRole()))) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
+        if (!User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
             throw new ForbiddenException();
         }
         databaseService.updateBook(book);
@@ -78,7 +99,10 @@ public class BookServiceImplementation implements BookService {
 
     @Override
     public void deleteBook(@NotNull SessionInfo sessionInfo, @NotNull Long book) {
-        if (!(User.ADMIN_ROLE.equals(sessionInfo.getRole()) || User.WORKER_ROLE.equals(sessionInfo.getRole()))) {
+        if (User.UNAUTHORIZED.equals(sessionInfo.getRole())) {
+            throw new UnauthorizedException();
+        }
+        if (!User.ADMIN_ROLE.equals(sessionInfo.getRole())) {
             throw new ForbiddenException();
         }
         databaseService.deleteBook(book);
