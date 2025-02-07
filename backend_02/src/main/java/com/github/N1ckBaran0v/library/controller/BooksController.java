@@ -3,7 +3,9 @@ package com.github.N1ckBaran0v.library.controller;
 import com.github.N1ckBaran0v.library.component.SessionInfo;
 import com.github.N1ckBaran0v.library.data.Book;
 import com.github.N1ckBaran0v.library.form.SearchForm;
+import com.github.N1ckBaran0v.library.service.BookNotFoundException;
 import com.github.N1ckBaran0v.library.service.BookService;
+import com.github.N1ckBaran0v.library.service.UserNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,34 +32,58 @@ public class BooksController {
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody Book book, @NotNull SessionInfo sessionInfo) {
         bookService.createBook(sessionInfo, book);
-        return new ResponseEntity<>("201 Created", HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> update(@RequestBody Book book, @NotNull SessionInfo sessionInfo) {
-        bookService.updateBook(sessionInfo, book);
-        return new ResponseEntity<>("202 Accepted", HttpStatus.ACCEPTED);
+        var response = ResponseEntity.accepted().build();
+        try {
+            bookService.updateBook(sessionInfo, book);
+        } catch (BookNotFoundException e) {
+            response = ResponseEntity.badRequest().body("Book not found");
+        }
+        return response;
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody Long book, @NotNull SessionInfo sessionInfo) {
-        bookService.deleteBook(sessionInfo, book);
-        return new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT);
+        var response = ResponseEntity.noContent().build();
+        try {
+            bookService.deleteBook(sessionInfo, book);
+        } catch (BookNotFoundException e) {
+            response = ResponseEntity.badRequest().body("Book not found");
+        }
+        return response;
     }
 
     @PostMapping("/get")
     public ResponseEntity<?> getBooks(@RequestBody List<Long> books,
                                       @RequestParam String username,
                                       @NotNull SessionInfo sessionInfo) {
-        bookService.getBooks(sessionInfo, username, books);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        var response = ResponseEntity.ok().build();
+        try {
+            bookService.getBooks(sessionInfo, username, books);
+        } catch (BookNotFoundException e) {
+            response = ResponseEntity.badRequest().body("Book not found");
+        } catch (UserNotFoundException e) {
+            response = ResponseEntity.badRequest().body("User not found");
+        }
+        return response;
     }
 
     @PostMapping("/return")
     public ResponseEntity<?> returnBooks(@RequestBody List<Long> books,
                                          @RequestParam String username,
                                          @NotNull SessionInfo sessionInfo) {
-        bookService.returnBooks(sessionInfo, username, books);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        var response = ResponseEntity.ok().build();
+        try {
+            bookService.returnBooks(sessionInfo, username, books);
+        } catch (BookNotFoundException e) {
+            response = ResponseEntity.badRequest().body("Book not found");
+        } catch (UserNotFoundException e) {
+            response = ResponseEntity.badRequest().body("User not found");
+        }
+        return response;
     }
 }

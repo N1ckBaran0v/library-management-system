@@ -32,6 +32,8 @@ dependencies {
     implementation("org.jetbrains:annotations:26.0.1")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core:5.15.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
 }
 
 tasks.test {
